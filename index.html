@@ -306,12 +306,60 @@
       if (window.estruturasLayer) {
         estruturasLayer.forEach(e => {
 
-          let icone = L.divIcon({
-            className: '',
-            html: `<div style="font-size:${tamanho - 10}px;">${e.data.nome.split(' ')[0]}</div>`,
-            iconSize: [tamanho, tamanho],
-            iconAnchor: [tamanho / 2, tamanho / 2]
-          });
+          let icone;
+
+          // 🔹 DEPÓSITO (mantém padrão visual)
+          if (e.data.nome.includes("Depósito")) {
+
+            let cor = "#388e3c";
+
+            if (deposito.estoque <= 600) cor = "#fbc02d";
+            if (deposito.estoque < 300) cor = "#d32f2f";
+
+            icone = L.divIcon({
+              className: '',
+              html: `
+          <div style="
+            width: ${tamanho}px;
+            height: ${tamanho}px;
+            background: ${cor};
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+          ">
+            <span style="font-size:${tamanho - 14}px;">📦</span>
+          </div>
+        `,
+              iconSize: [tamanho, tamanho],
+              iconAnchor: [tamanho / 2, tamanho / 2]
+            });
+
+          } else {
+
+            // 🔹 OUTRAS ESTRUTURAS (casa, curral)
+            let emoji = e.data.nome.split(' ')[0];
+            let nome = e.data.nome.substring(e.data.nome.indexOf(' ') + 1);
+
+            icone = L.divIcon({
+              className: '',
+              html: `
+          <div style="
+            font-size:${tamanho - 12}px;
+            color:white;
+            text-shadow:1px 1px 3px rgba(0,0,0,0.8);
+            white-space: nowrap;
+          ">
+            <span style="font-size:${tamanho - 6}px;">${emoji}</span>
+            ${nome}
+          </div>
+        `,
+              iconSize: [tamanho, tamanho],
+              iconAnchor: [tamanho / 2, tamanho / 2]
+            });
+
+          }
 
           e.marker.setIcon(icone);
 
