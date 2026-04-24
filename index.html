@@ -356,22 +356,20 @@
 
             // 🔹 OUTRAS ESTRUTURAS (casa, curral)
             let emoji = e.data.nome.split(' ')[0];
-            let nome = e.data.nome.substring(e.data.nome.indexOf(' ') + 1);
 
             icone = L.divIcon({
               className: '',
               html: `
-          <div style="
-            font-size:${tamanhoTexto}px;
-            color:white;
-            text-shadow:1px 1px 3px rgba(0,0,0,0.8);
-            white-space: nowrap;
-          ">
-            <span style="font-size:${tamanhoTexto + 4}px;">${emoji}</span>
-            ${nome}
-          </div>
-        `,
-              iconSize: [tamanho, tamanho],
+                <div style="
+                  font-size:${tamanho - 10}px;
+                  display:flex;
+                  align-items:center;
+                  justify-content:center;
+                ">
+                  ${emoji}
+                </div>
+              `,
+              iconSize: [tamanho - 6, tamanho - 6],
               iconAnchor: [tamanho / 2, tamanho / 2]
             });
 
@@ -941,15 +939,10 @@
       let icone = L.divIcon({
         className: '',
         html: `<div style="
-    font-size:10px;
-    color:white;
-    text-shadow:1px 1px 3px rgba(0,0,0,0.8);
-    white-space: nowrap;
-    padding: 2px 6px;
-  ">
-    <span style="font-size:18px;">${e.nome.split(' ')[0]}</span>
-    ${e.nome.substring(e.nome.indexOf(' ') + 1)}
-  </div>`
+          font-size:20px;
+        ">
+          ${e.nome.split(' ')[0]}
+        </div>`
       });
 
       let popupTexto = e.nome;
@@ -1042,10 +1035,13 @@
 
 
       // 🔥 TOOLTIP (IGUAL AO COCHO)
+      let emoji = e.nome.split(' ')[0];
+      let nomeLimpo = e.nome.substring(e.nome.indexOf(' ') + 1);
+
       marker.bindTooltip(`
         <div style="display:flex; align-items:center; gap:6px;">
-          <span style="font-size:16px;">📦</span>
-          <span>${e.nome.replace("📦 ", "")}</span>
+          <span style="font-size:16px;">${emoji}</span>
+          <span>${nomeLimpo}</span>
         </div>
       `);
 
