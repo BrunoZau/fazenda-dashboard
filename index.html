@@ -156,6 +156,11 @@
       display: none;
     }
 
+    .logo-mobile img {
+      width: 40px;
+      height: 40px;
+    }
+
     #legenda {
       position: fixed;
       right: 20px;
@@ -175,44 +180,51 @@
 
       .top-panel {
         left: 50%;
+        top: 10px;
         transform: translateX(-50%);
         overflow-x: auto;
         justify-content: flex-start;
         padding: 8px;
-        max-width: 95%;
+        max-width: 92%;
+        gap: 10px
       }
 
       .card {
-        min-width: 90px;
+        min-width: 95px;
         flex-shrink: 0;
       }
 
       #legenda {
-        top: 80px;
+        top: 95px;
         right: 10px;
       }
 
     }
 
-    @media (max-width: 768px) and (orientation: landscape) {
+    @media (max-width: 900px) and (orientation: landscape) {
+
+      .header-fazenda {
+        display: none;
+      }
+
+      .logo-mobile {
+        display: block;
+      }
 
       .top-panel {
         top: 5px;
+        left: 50%;
         transform: translateX(-50%) scale(0.9);
+        max-width: 92%;
+        overflow-x: auto;
       }
 
       #legenda {
         top: auto;
-        bottom: 20px;
+        bottom: 15px;
         right: 10px;
       }
 
-    }
-
-
-    .logo-mobile img {
-      width: 40px;
-      height: 40px;
     }
   </style>
 </head>
