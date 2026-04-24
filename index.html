@@ -434,20 +434,29 @@
 
           let cor = corCoxo(c.data.qtd);
 
+          let borda = "2px solid white";
+          let classeAnimacao = "";
+
+          if (c.data.qtd < 5) {
+            borda = "3px solid #ff0000";
+            classeAnimacao = "pulse";
+          }
+
           let icone = L.divIcon({
             className: '',
             html: `
-        <div style="
-          width: ${tamanho}px;
-          height: ${tamanho}px;
-          background: ${cor};
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border: 2px solid white;
-        ">
-          <img src="trough.png" style="
+              <div class="${classeAnimacao}" style="
+                width: ${tamanho}px;
+                height: ${tamanho}px;
+                background: ${cor};
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: ${borda};
+                box-shadow: 0 0 6px rgba(0,0,0,0.4);
+              ">
+                <img src="trough.png" style="
             width: ${tamanho - 8}px;
             height: ${tamanho - 8}px;
           ">
@@ -476,22 +485,32 @@
             if (deposito.estoque <= 600) cor = "#fbc02d";
             if (deposito.estoque < 300) cor = "#d32f2f";
 
+            let classeAnimacao = "";
+            let borda = "2px solid white";
+
+            // 🔴 CRÍTICO → pulsar
+            if (deposito.estoque < 300) {
+              classeAnimacao = "pulse";
+              borda = "3px solid #ff0000";
+            }
+
             icone = L.divIcon({
               className: '',
               html: `
-          <div style="
-            width: ${tamanho}px;
-            height: ${tamanho}px;
-            background: ${cor};
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid white;
-          ">
-            <span style="font-size:${tamanho - 14}px;">📦</span>
-          </div>
-        `,
+                <div class="${classeAnimacao}" style="
+                  width: ${tamanho}px;
+                  height: ${tamanho}px;
+                  background: ${cor};
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  border: ${borda};
+                  box-shadow: 0 0 6px rgba(0,0,0,0.4);
+                ">
+                  <span style="font-size:${tamanho - 14}px;">📦</span>
+                </div>
+              `,
               iconSize: [tamanho, tamanho],
               iconAnchor: [tamanho / 2, tamanho / 2]
             });
