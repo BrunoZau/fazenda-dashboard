@@ -166,7 +166,26 @@
       z-index: 1000;
     }
 
+    .btn-legenda {
+      background: white;
+      padding: 8px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      text-align: center;
+
+      width: 100%;
+      box-sizing: border-box;
+
+      font-size: 12px;
+    }
+
     @media (max-width: 768px) {
+
+      .btn-legenda {
+        font-size: 10px;
+        padding: 6px;
+      }
 
       .header-fazenda {
         display: none;
@@ -223,6 +242,11 @@
     }
 
     @media (max-width: 900px) and (orientation: landscape) {
+
+      .btn-legenda {
+        font-size: 11px;
+        padding: 6px;
+      }
 
       .logo-mobile img {
         width: 135px;
@@ -284,15 +308,7 @@
   <div id="legenda">
 
     <!-- BOTÃO -->
-    <div onclick="toggleLegenda()" style="
-    background:white;
-    padding:10px;
-    border-radius:10px;
-    cursor:pointer;
-    box-shadow:0 2px 8px rgba(0,0,0,0.3);
-    text-align:center;
-    width:100%;
-  ">
+    <div class="btn-legenda" onclick="toggleLegenda()">
       <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
         <img src="legenda.png" style="width:16px; height:16px;">
         <span>Legenda</span>
@@ -1412,7 +1428,7 @@
       const meio = (zoomRect.right + painelRect.left) / 2;
 
       // 🔥 centraliza a ferradura
-      logo.style.left = (meio - (logo.offsetWidth / 2)) + 'px';
+      logo.style.left = (meio - (logo.offsetWidth / 2)) + 10 + 'px';
     }
 
     // roda quando carrega
