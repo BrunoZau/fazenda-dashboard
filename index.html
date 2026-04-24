@@ -150,9 +150,7 @@
 
     .logo-mobile {
       position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 1000;
+      z-index: 3000;
       display: none;
     }
 
@@ -240,15 +238,6 @@
 
       .logo-mobile {
         display: block;
-        position: absolute;
-        top: 40%;
-
-        left: 10px;
-
-        transform: translateY(-50%);
-        /* 🔥 centraliza verticalmente */
-
-        z-index: 3000;
       }
 
       .top-panel {
@@ -1399,6 +1388,34 @@
 
     </div>
   </div>
+
+  <script>
+    function alinharLogo() {
+      const painel = document.querySelector('.top-panel');
+      const logo = document.querySelector('.logo-mobile');
+      const zoom = document.querySelector('.leaflet-control-zoom');
+
+      if (!painel || !logo || !zoom) return;
+
+      const painelRect = painel.getBoundingClientRect();
+      const zoomRect = zoom.getBoundingClientRect();
+
+      // 🔥 mesma altura dos cards
+      logo.style.top = (painelRect.top - 10) + 'px';
+
+      // 🔥 calcula o meio entre zoom e painel
+      const meio = (zoomRect.right + painelRect.left) / 2;
+
+      // 🔥 centraliza a ferradura
+      logo.style.left = (meio - (logo.offsetWidth / 2)) + 'px';
+    }
+
+    // roda quando carrega
+    window.addEventListener('load', alinharLogo);
+
+    // roda quando muda tamanho (girar celular)
+    window.addEventListener('resize', alinharLogo);
+  </script>
 
 </body>
 
