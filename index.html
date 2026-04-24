@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Fazenda Água Branca - Dashboard</title>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <style>
+    body {
+      margin: 0;
+    }
+
+    #map {
+      height: 100vh;
+    }
+
+    .tooltip-campo {
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .top-panel {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+
+    .campo-label {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 12px;
+      border: 1px solid #ccc;
+    }
+
+    .header-fazenda {
+      position: absolute;
+      top: 10px;
+      left: 70px;
+      z-index: 1000;
+      color: white;
+      font-weight: bold;
+      font-size: 25px;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
+      text-align: center;
+    }
+
+    .header-linha {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-fazenda strong {
+      font-size: 30px;
+      font-weight: bold;
+      line-height: 1.2;
+    }
+
+    .icone-fazenda {
+      width: 40px;
+      height: 40px;
+      filter: brightness(0) invert(1);
+      position: relative;
+      top: 8px;
+    }
+
+    .header-fazenda span {
+      display: block;
+      font-size: 16px;
+      font-weight: normal;
+      color: white;
+      opacity: 0.85;
+    }
+
+    .top-panel {
+      display: flex;
+      gap: 12px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 10px 14px;
+      text-align: center;
+      min-width: 80px;
+    }
+
+    .card .numero {
+      font-size: 20px;
+      font-weight: bold;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+
+      height: 32px;
+      /* 🔥 ALTURA FIXA (ESSA É A CHAVE) */
+    }
+
+    .card .label {
+      font-size: 11px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .leaflet-interactive {
+      transition: all 0.2s ease;
+    }
+
+    .pulse {
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.2);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .leaflet-container :focus {
+      outline: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="map"></div>
+  <div class="header-fazenda">
+    <div class="header-linha">
+      <img src="animal.png" class="icone-fazenda">
+      <strong>Fazenda Água Branca</strong>
+    </div>
+    <span>Dashboard Operacional</span>
+  </div>
+  <div class="top-panel" id="painel"></div>
+
+  <div id="legenda" style="
+  position:fixed;
+  right:20px;
+  top:100px;
+  z-index:1000;
+">
+
+    <!-- BOTÃO -->
+    <div onclick="toggleLegenda()" style="
+    background:white;
+    padding:10px;
+    border-radius:10px;
+    cursor:pointer;
+    box-shadow:0 2px 8px rgba(0,0,0,0.3);
+    text-align:center;
+    width:200px;
+  ">
+      ℹ️ Legenda
+    </div>
+
+    <!-- CONTEÚDO -->
+    <div id="conteudoLegenda" style="
+    display:none;
+    margin-top:10px;
+    background:white;
+    padding:12px;
+    border-radius:10px;
+    width:200px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.3);
+    font-size:12px;
+    line-height:1.4;
+  ">
+
+      <b>🌿 Campo</b><br>
+      🟢 Normal: até 1.5/ha<br>
+      🟡 Atenção: 1.5 a 2.0/ha<br>
+      🔴 Crítico: acima de 2.0/ha<br><br>
+
+      <hr style="margin:10px 0; border:0; border-top:1px solid #ccc;">
+
+      <b>
+        <img src="trough.png" style="width:14px; vertical-align:middle; margin-right:5px;">
+        Estoque (Cochos)
+      </b><br>
+      🟢 Normal: > 10 sacos<br>
+      🟡 Atenção: 5 a 10 sacos<br>
+      🔴 Crítico: < 5 sacos<br><br>
+
+        <b>⏳ Atualização</b><br>
+        ✅ Até 2 dias<br>
+        🟨 Até 4 dias<br>
+        🔻 Mais de 4 dias
+
+        <hr style="margin:10px 0; border:0; border-top:1px solid #ccc;">
+
+        <br>
+
+        <b>📦 Depósito de Sal</b><br>
+        🟢 Normal: > 600 sacos<br>
+        🟡 Atenção: 300 a 600 sacos<br>
+        🔴 Crítico: < 300 sacos<br><br>
+
+          <b>⏳ Atualização (Depósito)</b><br>
+          ✅ Até 2 meses<br>
+          🟨 Até 3 meses<br>
+          🔻 Mais de 3 meses
+
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+
+    // ================= MAPA =================
+    var map = L.map('map', {
+      minZoom: 12,
+      maxZoom: 17,
+      zoomSnap: 1,
+      zoomDelta: 1
+    }).setView([-9.18, -67.17], 14);
+
+    L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      {
+        maxZoom: 17,
+        maxNativeZoom: 17
+      }
+    ).addTo(map);
+
+    // ================= FUNÇÕES =================
+
+    function raioRebanho(qtdAnimais) {
+      // escala visual (ajustável depois)
+      return Math.sqrt(qtdAnimais) * 20;
+    }
+
+    function quantidadeIcones(qtdAnimais) {
+      if (qtdAnimais <= 80) return 4;
+      if (qtdAnimais <= 120) return 5;
+      if (qtdAnimais <= 160) return 6;
+      return 7;
+    }
+
+    function statusDeposito(qtd) {
+      if (qtd > 600) return "🟢 Normal";
+      if (qtd >= 300) return "🟡 Atenção";
+      return "🔴 Crítico";
+    }
+
+    function mesesDesde(dataRef) {
+
+      let hoje = new Date(dataSistema);
+      let data = new Date(dataRef);
+
+      let anos = hoje.getFullYear() - data.getFullYear();
+      let meses = hoje.getMonth() - data.getMonth();
+
+      return anos * 12 + meses;
+    }
+
+    function statusAtualizacaoDeposito(meses) {
+      if (meses <= 2) return "✅";
+      if (meses <= 3) return "🟨";
+      return "🔻";
+    }
+
+    function corCoxo(q) {
+      if (q < 5) return "#d32f2f";
+      if (q <= 10) return "#fbc02d";
+      return "#388e3c";
+    }
+
+    function statusCoxo(q) {
+      if (q < 5) return "🔴 Crítico";
+      if (q <= 10) return "🟡 Atenção";
+      return "🟢 Normal";
+    }
+
+    function diasDesde(dataCoxo) {
+
+      let hoje = new Date(dataSistema);
+      let data = new Date(dataCoxo);
+
+      let diferenca = hoje - data;
+
+      let dias = Math.floor(diferenca / (1000 * 60 * 60 * 24));
+
+      return dias;
+    }
+
+    function statusData(dias) {
+      if (dias <= 2) return "✅";
+      if (dias <= 4) return "🟨";
+      return "🔻";
+    }
+
+    // ================= CAMPOS =================
+    const campos = [
+
+      {
+        nome: "Campo Marte",
+        coords: [
+          [-9.17200, -67.16872],
+          [-9.17778, -67.15831],
+          [-9.18461, -67.16692],
+          [-9.18100, -67.17289]
+        ],
+        gado: 120,
+        area: 100,
+        cor: "#d32f2f"
+      },
+
+      {
+        nome: "Campo Netuno",
+        coords: [
+          [-9.18122, -67.17306],
+          [-9.18486, -67.16706],
+          [-9.19878, -67.17525],
+          [-9.19647, -67.18086]
+        ],
+        gado: 140,
+        area: 110,
+        cor: "#2e7d32"
+      },
+
+      {
+        nome: "Campo Saturno",
+        coords: [
+          [-9.17711, -67.18106],
+          [-9.18108, -67.17319],
+          [-9.20786, -67.18736],
+          [-9.19425, -67.19258]
+        ],
+        gado: 140,
+        area: 90,
+        cor: "#1976d2"
+      },
+
+      {
+        nome: "Campo Vênus",
+        coords: [
+          [-9.17189, -67.16842],
+          [-9.16108, -67.14892],
+          [-9.16717, -67.13483],
+          [-9.18181, -67.15019]
+        ],
+        gado: 100,
+        area: 90,
+        cor: "#fbc02d"
+      },
+
+      {
+        nome: "Maternidade",
+        coords: [
+          [-9.17525, -67.17042],
+          [-9.17142, -67.17697],
+          [-9.17689, -67.18100],
+          [-9.18092, -67.17317]
+        ],
+        gado: 150,
+        area: 70,
+        cor: "#8e24aa"
+      }
+
+    ];
+
+    // ================= COCHOS =================
+    const cochos = [
+      { nome: "Cocho Marte 1", campo: "Marte", lat: -9.17656, lng: -67.16586, qtd: 0, data: "2026-04-23" },
+      { nome: "Cocho Marte 2", campo: "Marte", lat: -9.18197, lng: -67.16978, qtd: 4, data: "2026-04-21" },
+      { nome: "Cocho Netuno", campo: "Netuno", lat: -9.18997, lng: -67.17478, qtd: 15, data: "2026-04-20" },
+      { nome: "Cocho Saturno", campo: "Saturno", lat: -9.19100, lng: -67.18500, qtd: 12, data: "2026-04-18" },
+      { nome: "Cocho Vênus", campo: "Vênus", lat: -9.16750, lng: -67.14517, qtd: 4, data: "2026-04-19" },
+      { nome: "Cocho Maternidade", campo: "Maternidade", lat: -9.17610, lng: -67.17530, qtd: 10, data: "2026-04-15" }
+    ];
+
+    // ================= ESTRUTURAS =================
+
+    let deposito = {
+      nome: "Depósito de Sal",
+      estoque: 200,
+      ultimaEntrada: "2026-01-01",
+      ultimaAtualizacao: "2026-04-20"
+    };
+
+    const estruturas = [
+      { nome: "🏠 Casa da Fazenda", lat: -9.17420, lng: -67.17010 },
+      { nome: "📦 Depósito de Sal", lat: -9.17389, lng: -67.16990 },
+      { nome: "🐂 Curral", lat: -9.17480, lng: -67.17025 }
+    ];
+
+    // ================= VARIÁVEIS =================
+    let total = 0;
+    let criticos = 0;
+    let dataSistema = "2026-04-23";
+
+    let detalheAnimais = [];
+    let detalheCriticos = [];
+    let detalheDeposito = [];
+
+    let animaisMovimento = [];
+
+    let alertasCampo = [];
+    let alertasEstoque = [];
+    let alertasData = [];
+
+    // ================= CAMPOS =================
+    let campoSelecionado = null;
+
+    campos.forEach(c => {
+
+      detalheAnimais.push(`${c.nome}: ${c.gado} animais`);
+
+      total += c.gado;
+
+      let poly = L.polygon(c.coords, {
+        color: "#999",
+        fillOpacity: 0.15,
+        weight: 2
+      }).addTo(map);
+
+      // ================= CENTRO DO CAMPO =================
+      let centro = poly.getBounds().getCenter();
+
+      // ================= CÍRCULO DO REBANHO =================
+      let circulo = L.circle(centro, {
+        radius: raioRebanho(c.gado),
+        color: "#666",
+        weight: 1,
+        fillColor: "#ffffff",
+        fillOpacity: 0.2
+      }).addTo(map);
+
+      // guardar para movimento
+      if (!window.rebanhos) window.rebanhos = [];
+
+      rebanhos.push({
+        circulo: circulo,
+        centro: centro,
+        poly: poly
+      });
+
+      // ================= ÍCONES DE ANIMAIS =================
+      let qtdIcones = quantidadeIcones(c.gado);
+
+      for (let i = 0; i < qtdIcones; i++) {
+
+        // posição levemente aleatória dentro do círculo
+        let offsetLat = (Math.random() - 0.5) * 0.0015;
+        let offsetLng = (Math.random() - 0.5) * 0.0015;
+
+        let iconeAnimal = L.divIcon({
+          className: '',
+          html: `<div style="font-size:16px;">🐄</div>`,
+          iconSize: [20, 20],
+          iconAnchor: [10, 10]
+        });
+
+        let markerAnimal = L.marker([
+          centro.lat + offsetLat,
+          centro.lng + offsetLng
+        ], {
+          icon: iconeAnimal
+        }).addTo(map);
+
+        // guardar para movimento
+        animaisMovimento.push({
+          marker: markerAnimal,
+          centro: centro,
+          rebanho: circulo
+        });
+      }
+
+      // ================= SALVAR ESTILO ORIGINAL =================
+      poly.estiloOriginal = {
+        weight: 2,
+        fillOpacity: 0.15,
+        dashArray: null
+      };
+
+      // ================= HOVER (TOOLTIP) =================
+      poly.bindTooltip(`🌿 ${c.nome}`, {
+        permanent: false,
+        direction: "top",
+        offset: [0, -10],
+        sticky: true,
+        className: "tooltip-campo"
+      });
+
+      // ================= EFEITO VISUAL NO HOVER =================
+      poly.on('mouseover', function () {
+        // não aplicar hover se for o campo selecionado
+        if (this !== campoSelecionado) {
+          this.setStyle({
+            weight: 4,
+            fillOpacity: 0.25
+          });
+        }
+      });
+
+      poly.on('mouseout', function () {
+        // não resetar se for o selecionado
+        if (this !== campoSelecionado) {
+          this.setStyle(poly.estiloOriginal);
+        }
+      });
+
+      // ================= CÁLCULOS DO CAMPO =================
+
+      // Cochos do campo
+      let cochosCampo = cochos.filter(co => c.nome.includes(co.campo));
+
+      // Cochos críticos
+      let cochosCriticos = cochosCampo.filter(co => co.qtd < 5);
+
+      // Média de sal
+      let mediaSal = 0;
+
+      if (cochosCampo.length > 0) {
+        let totalSal = cochosCampo.reduce((soma, co) => soma + co.qtd, 0);
+        mediaSal = (totalSal / cochosCampo.length).toFixed(1);
+      }
+
+      // Lotação
+      let lotacao = c.gado / c.area;
+      let lotacaoFormatada = lotacao.toFixed(1);
+
+      // Status do campo
+      let statusCampo = "🟢 Normal";
+
+      if (lotacao > 1.5) {
+        statusCampo = "🟡 Atenção";
+      }
+
+      if (lotacao > 2.0) {
+        statusCampo = "🔴 Crítico";
+      }
+
+      let corCampo = "#2e7d32"; // verde
+
+      if (lotacao > 1.5) {
+        corCampo = "#fbc02d"; // amarelo
+      }
+
+      if (lotacao > 2.0) {
+        corCampo = "#d32f2f"; // vermelho
+      }
+
+      if (lotacao > 1.5) {
+        alertasCampo.push("🌿 " + c.nome + " em atenção");
+      }
+
+      // aplicar no polígono
+      poly.setStyle({
+        color: corCampo,
+        fillColor: corCampo
+      });
+
+      // ================= POPUP =================
+      poly.bindPopup(`
+        <b>🌿 ${c.nome}</b><br><br>
+
+        🐄 ${c.gado} animais<br>
+        📐 Área: ${c.area} ha<br>
+        📊 Lotação: ${lotacaoFormatada}/ha<br><br>
+
+        <b>Situação do Campo:</b><br>
+        ${statusCampo}<br><br>
+
+        <img src="trough.png" style="width:16px; vertical-align:middle; margin-right:6px;">
+        <span style="vertical-align:middle;">Cochos: ${cochosCampo.length}</span><br>
+        ⚠️ Críticos: ${cochosCriticos.length}<br><br>
+
+        📊 Média de sal: ${mediaSal} sacos
+      `);
+
+      // ================= CLICK (SELEÇÃO) =================
+      poly.on('click', function () {
+
+        // resetar campo anterior
+        if (campoSelecionado) {
+          campoSelecionado.setStyle(campoSelecionado.estiloOriginal);
+        }
+
+        // aplicar destaque no atual
+        this.setStyle({
+          weight: 5,
+          fillOpacity: 0.3,
+          dashArray: "6"
+        });
+
+        campoSelecionado = this;
+      });
+
+    });
+
+    // ================= COCHOS =================
+    cochos.forEach(c => {
+
+      if (c.qtd < 5) {
+        detalheCriticos.push(`
+          <div style="display:flex; align-items:center; gap:6px;">
+            <img src="trough.png" style="width:16px; height:16px;">
+            <span>${c.nome} (${c.qtd} sacos)</span>
+          </div>
+        `);
+      }
+
+      let cor = corCoxo(c.qtd);
+
+      // CRÍTICO
+      if (c.qtd < 5) {
+        criticos++;
+        alertasEstoque.push("🔴 " + c.nome + " crítico");
+      }
+
+      // ALERTA (atenção)
+      else if (c.qtd <= 10) {
+        alertasEstoque.push("🟡 " + c.nome + " atenção");
+      }
+
+      let borda = "2px solid white";
+
+      if (c.qtd < 5) {
+        borda = "3px solid #ff0000";
+      }
+
+      let classeAnimacao = "";
+
+      if (c.qtd < 5) {
+        classeAnimacao = "pulse";
+      }
+
+      let iconeCoxo = L.divIcon({
+        className: '',
+        html: `
+          <div class="${classeAnimacao}" style="
+            width: 30px;
+            height: 30px;
+            background: ${cor};
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: ${borda};
+            box-shadow: 0 0 6px rgba(0,0,0,0.4);
+          ">
+            <img src="trough.png" style="
+              width: 22px;
+              height: 22px;
+            ">
+          </div>
+        `,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+      });
+
+      let marker = L.marker([c.lat, c.lng], {
+        icon: iconeCoxo
+      }).addTo(map);
+
+      marker.bindTooltip(`
+        <div style="display:flex; align-items:center; gap:6px;">
+          <img src="trough.png" style="width:16px; height:16px;">
+          <span>${c.nome}<br>${c.qtd} sacos</span>
+        </div>
+      `);
+
+      let statusCoxoAtual = statusCoxo(c.qtd);
+
+      let dias = diasDesde(c.data);
+      let statusAtualizacao = statusData(dias);
+      let partes = c.data.split("-");
+      let dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+      if (dias >= 3) {
+        alertasData.push("⏳ " + c.nome + " desatualizado");
+      }
+
+      marker.bindPopup(`
+      <b>
+        <img src="trough.png" style="width:18px; vertical-align:middle; margin-right:6px;">
+        ${c.nome}
+      </b><br>
+      Estoque: ${c.qtd} sacos<br>
+      Situação: ${statusCoxoAtual}<br><br>
+      Atualizado em ${dataFormatada} ${statusAtualizacao}
+      `);
+
+    });
+
+    // ================= ESTRUTURAS =================
+    estruturas.forEach(e => {
+
+      // 🔹 ÍCONE PADRÃO (CASA, CURRAL)
+      let icone = L.divIcon({
+        className: '',
+        html: `<div style="
+    font-size:10px;
+    color:white;
+    text-shadow:1px 1px 3px rgba(0,0,0,0.8);
+    white-space: nowrap;
+    padding: 2px 6px;
+  ">
+    <span style="font-size:18px;">${e.nome.split(' ')[0]}</span>
+    ${e.nome.substring(e.nome.indexOf(' ') + 1)}
+  </div>`
+      });
+
+      let popupTexto = e.nome;
+
+      // 🔹 SE FOR DEPÓSITO → ALTERA ÍCONE + POPUP
+      if (e.nome.includes("Depósito")) {
+
+        // 🎯 COR DO DEPÓSITO
+        let corDeposito = "#388e3c";
+
+        if (deposito.estoque <= 600) {
+          corDeposito = "#fbc02d";
+        }
+
+        if (deposito.estoque < 300) {
+          corDeposito = "#d32f2f";
+        }
+
+        // 🔥 ÍCONE DO DEPÓSITO (CORRIGIDO)
+        let borda = "2px solid white";
+        let classeAnimacao = "";
+
+        // 🔴 CRÍTICO
+        if (deposito.estoque < 300) {
+          borda = "3px solid #ff0000";
+          classeAnimacao = "pulse";
+        }
+
+        // 🟡 ATENÇÃO
+        else if (deposito.estoque <= 600) {
+          borda = "3px solid #fbc02d";
+        }
+
+        // 🟢 NORMAL (já padrão)
+
+        icone = L.divIcon({
+          className: '',
+          html: `
+            <div class="${classeAnimacao}" style="
+              width: 30px;
+              height: 30px;
+              background: ${corDeposito};
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border: ${borda};
+              box-shadow: 0 0 6px rgba(0,0,0,0.4);
+            ">
+              <span style="font-size:16px;">📦</span>
+            </div>
+          `,
+          iconSize: [40, 40],
+          iconAnchor: [20, 20]
+        });
+
+        // 🎯 STATUS
+        let statusEstoque = statusDeposito(deposito.estoque);
+
+        let meses = mesesDesde(deposito.ultimaAtualizacao);
+        let statusAtualizacao = statusAtualizacaoDeposito(meses);
+
+        let dataEntrada = deposito.ultimaEntrada.split("-").reverse().join("/");
+        let dataAtualizacao = deposito.ultimaAtualizacao.split("-").reverse().join("/");
+
+        // 🔥 POPUP
+        popupTexto = `
+          <b>📦 ${deposito.nome}</b><br><br>
+
+          Estoque Atual: ${deposito.estoque} sacos<br>
+          Status: ${statusEstoque}<br><br>
+
+          Última entrada: ${dataEntrada}<br>
+          Atualizado em: ${dataAtualizacao} ${statusAtualizacao}
+        `;
+      }
+
+      let marker = L.marker([e.lat, e.lng], { icon: icone })
+        .addTo(map)
+        .bindPopup(popupTexto);
+
+      // 🔥 TOOLTIP (IGUAL AO COCHO)
+      marker.bindTooltip(`
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="font-size:16px;">📦</span>
+          <span>${e.nome.replace("📦 ", "")}</span>
+        </div>
+      `);
+
+    });
+
+
+    // ================= PAINEL =================
+
+    // ================= DEPÓSITO NOS ALERTAS =================
+
+    // Status do depósito
+    let statusEstoqueDeposito = statusDeposito(deposito.estoque);
+    let mesesDeposito = mesesDesde(deposito.ultimaAtualizacao);
+    let statusAtualizacaoDep = statusAtualizacaoDeposito(mesesDeposito);
+
+    let dataEntrada = deposito.ultimaEntrada.split("-").reverse().join("/");
+    let dataAtualizacao = deposito.ultimaAtualizacao.split("-").reverse().join("/");
+
+    detalheDeposito = [
+      `<b>📦 ${deposito.nome}</b><br><br>
+      Estoque: ${deposito.estoque} sacos<br>
+      Status: ${statusEstoqueDeposito}<br><br>
+      Última entrada: ${dataEntrada}<br>
+      Atualizado em: ${dataAtualizacao} ${statusAtualizacaoDep}`
+    ];
+
+    // ALERTA DE ESTOQUE
+    if (deposito.estoque < 300) {
+      alertasEstoque.push("🔴 Depósito crítico");
+    }
+    else if (deposito.estoque <= 600) {
+      alertasEstoque.push("🟡 Depósito em atenção");
+    }
+
+    // ALERTA DE ATUALIZAÇÃO
+    if (mesesDeposito >= 2) {
+      alertasData.push("⏳ Depósito desatualizado");
+    }
+
+    let alertas = [
+      "<b>🌿 Campos</b>",
+      ...alertasCampo,
+      "<br><b><img src='trough.png' style='width:14px; margin-right:4px;'> 📦 Estoque</b>",
+      ...alertasEstoque,
+      "<br><b>⏳ Atualização</b>",
+      ...alertasData
+    ];
+
+    // 🔢 CONTAGEM REAL (SEM TÍTULOS)
+    let totalAlertas = alertasCampo.length + alertasEstoque.length + alertasData.length;
+
+    document.getElementById("painel").innerHTML = `
+    <div class= "card" onclick = "abrirModal('Animais por Campo', detalheAnimais)">
+      <div class="numero">🐄 ${total}</div>
+      <div class="label">Animais</div>
+    </div>
+
+    <div class="card" onclick="abrirModal('Cochos Críticos', detalheCriticos)">
+      <div class="numero">
+        <img src="trough.png" style="width:35px; vertical-align:middle; margin-right:5px;">
+        ${criticos}
+      </div>
+      <div class="label">Críticos</div>
+    </div>
+
+    <div class="card" onclick="abrirModal('Depósito de Sal', detalheDeposito)">
+      <div class="numero">📦 ${deposito.estoque}</div>
+      <div class="label">Depósito</div>
+    </div>
+
+    <div class="card" onclick="abrirModal('Alertas Gerais', alertas)">
+      <div class="numero">⚠️ ${totalAlertas}</div>
+      <div class="label">Alertas</div>
+    </div>
+  `;
+
+    function mostrarAnimais() {
+      alert(detalheAnimais.join("\n"));
+    }
+
+    function mostrarCriticos() {
+      alert(detalheCriticos.join("\n"));
+    }
+
+    function mostrarAlertas() {
+      alert(alertas.join("\n"));
+    }
+
+    // ================= ZOOM =================
+    let grupo = L.featureGroup();
+    campos.forEach(c => grupo.addLayer(L.polygon(c.coords)));
+    map.fitBounds(grupo.getBounds());
+
+    function abrirModal(titulo, lista) {
+      document.getElementById("modalTitulo").innerText = titulo;
+      document.getElementById("modalConteudo").innerHTML = lista.join("<br>");
+      document.getElementById("modal").style.display = "flex";
+    }
+
+    function fecharModal() {
+      document.getElementById("modal").style.display = "none";
+    }
+
+    function toggleLegenda() {
+      let el = document.getElementById("conteudoLegenda");
+
+      if (el.style.display === "none") {
+        el.style.display = "block";
+      } else {
+        el.style.display = "none";
+      }
+    }
+
+    setInterval(() => {
+
+      animaisMovimento.forEach(animal => {
+
+        let pos = animal.marker.getLatLng();
+
+        // movimento pequeno e suave
+        let deltaLat = (Math.random() - 0.5) * 0.0001;
+        let deltaLng = (Math.random() - 0.5) * 0.0001;
+
+        let novaLat = pos.lat + deltaLat;
+        let novaLng = pos.lng + deltaLng;
+
+        // limitar distância do centro (não sair do círculo)
+        let centroAtual = animal.rebanho.getLatLng();
+
+        let dist = Math.sqrt(
+          Math.pow(novaLat - centroAtual.lat, 2) +
+          Math.pow(novaLng - centroAtual.lng, 2)
+        );
+
+        if (dist < 0.002) {
+          animal.marker.setLatLng([novaLat, novaLng]);
+        }
+
+      });
+
+    }, 1200); // intervalo lento (importante)
+
+    setInterval(() => {
+
+      if (!window.rebanhos) return;
+
+      rebanhos.forEach(r => {
+
+        let pos = r.circulo.getLatLng();
+
+        // movimento MUITO sutil
+        let deltaLat = (Math.random() - 0.5) * 0.0002;
+        let deltaLng = (Math.random() - 0.5) * 0.0002;
+
+        let novaLat = pos.lat + deltaLat;
+        let novaLng = pos.lng + deltaLng;
+
+        let novoCentro = L.latLng(novaLat, novaLng);
+
+        // 🔥 garantir que continua dentro do campo
+        if (r.poly.getBounds().contains(novoCentro)) {
+
+          r.circulo.setLatLng(novoCentro);
+
+          // atualizar centro lógico
+          r.centro = novoCentro;
+
+        }
+
+      });
+
+    }, 2000); // movimento lento
+
+  </script>
+
+  <div id="modal" style="
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.6);
+  z-index:2000;
+  align-items:center;
+  justify-content:center;
+">
+
+    <div style="
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    width:300px;
+    max-height:400px;
+    overflow:auto;
+  ">
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <strong id="modalTitulo">Título</strong>
+        <button onclick="fecharModal()" style="cursor:pointer;">✖</button>
+      </div>
+
+      <div id="modalConteudo"></div>
+
+    </div>
+  </div>
+
+</body>
+
+</html>
