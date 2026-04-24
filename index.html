@@ -421,7 +421,7 @@
     // ================= VARIÁVEIS =================
     let total = 0;
     let criticos = 0;
-    let dataSistema = "2026-04-23";
+    let dataSistema = "2026-04-24";
 
     let detalheAnimais = [];
     let detalheCriticos = [];
@@ -475,8 +475,17 @@
       for (let i = 0; i < qtdIcones; i++) {
 
         // posição levemente aleatória dentro do círculo
-        let offsetLat = (Math.random() - 0.5) * 0.0015;
-        let offsetLng = (Math.random() - 0.5) * 0.0015;
+        let raio = raioRebanho(c.gado);
+
+        // ângulo aleatório
+        let angulo = Math.random() * 2 * Math.PI;
+
+        // distância aleatória (limitada ao círculo)
+        let distancia = Math.random() * (raio * 0.00001);
+
+        // converter para lat/lng
+        let offsetLat = Math.cos(angulo) * distancia;
+        let offsetLng = Math.sin(angulo) * distancia;
 
         let iconeAnimal = L.divIcon({
           className: '',
