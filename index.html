@@ -200,24 +200,29 @@
       }
 
       #legenda {
-        top: 110px;
+        top: 100px;
         right: 10px;
 
-        max-height: 40vh;
-        max-width: 135px;
+        max-height: 45vh;
+        max-width: 160px;
         /* 🔥 reduz largura */
 
         overflow-y: auto;
         overflow-x: hidden;
         /* 🔥 evita corte lateral */
 
-        font-size: 9px;
+        font-size: 10px;
         padding: 6px 8px;
 
         border-radius: 10px;
 
         box-sizing: border-box;
         /* 🔥 garante ajuste interno */
+
+        word-wrap: break-word;
+        /* 🔥 QUEBRA TEXTO */
+        white-space: normal;
+        /* 🔥 PERMITE QUEBRA */
       }
 
     }
@@ -236,9 +241,13 @@
       .logo-mobile {
         display: block;
         position: absolute;
-        top: 0px;
-        /* 🔥 desce abaixo do zoom */
-        left: 15px;
+        top: 50%;
+
+        left: 10px;
+
+        transform: translateY(-50%);
+        /* 🔥 centraliza verticalmente */
+
         z-index: 3000;
       }
 
