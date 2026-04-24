@@ -176,6 +176,11 @@
 
       .logo-mobile {
         display: block;
+        position: absolute;
+        top: 5px;
+        left: 10px;
+        z-index: 3000;
+        /* 🔥 garante que fique acima do painel */
       }
 
       .top-panel {
@@ -195,8 +200,21 @@
       }
 
       #legenda {
-        top: 95px;
+        top: 85px;
         right: 10px;
+
+        max-height: 50vh;
+        /* 🔥 limita altura */
+        max-width: 200px;
+        /* 🔥 limita largura */
+
+        overflow-y: auto;
+        /* 🔥 ativa scroll */
+
+        font-size: 11px;
+        /* 🔥 reduz texto */
+        padding: 8px;
+        /* 🔥 mais compacto */
       }
 
     }
@@ -209,6 +227,11 @@
 
       .logo-mobile {
         display: block;
+        position: absolute;
+        top: 5px;
+        left: 10px;
+        z-index: 3000;
+        /* 🔥 mais alto que tudo */
       }
 
       .top-panel {
@@ -221,8 +244,19 @@
 
       #legenda {
         top: auto;
-        bottom: 15px;
+        bottom: 10px;
         right: 10px;
+
+        max-height: 55vh;
+        max-width: 220px;
+        /* 🔥 limita altura */
+        overflow-y: auto;
+        /* 🔥 ativa scroll */
+
+        font-size: 11px;
+        /* 🔥 reduz texto */
+        padding: 8px;
+        /* 🔥 mais compacto */
       }
 
     }
