@@ -157,8 +157,8 @@
     }
 
     .logo-mobile img {
-      width: 40px;
-      height: 40px;
+      width: 65px;
+      height: 65px;
     }
 
     #legenda {
@@ -177,7 +177,7 @@
       .logo-mobile {
         display: block;
         position: absolute;
-        top: 5px;
+        top: 15px;
         left: 10px;
         z-index: 3000;
         /* 🔥 garante que fique acima do painel */
@@ -195,7 +195,7 @@
       }
 
       .card {
-        min-width: 95px;
+        min-width: 85px;
         flex-shrink: 0;
       }
 
@@ -204,22 +204,28 @@
         right: 10px;
 
         max-height: 50vh;
-        /* 🔥 limita altura */
-        max-width: 200px;
-        /* 🔥 limita largura */
+        max-width: 180px;
+        /* 🔥 reduz largura */
 
         overflow-y: auto;
-        /* 🔥 ativa scroll */
+        overflow-x: hidden;
+        /* 🔥 evita corte lateral */
 
         font-size: 11px;
-        /* 🔥 reduz texto */
         padding: 8px;
-        /* 🔥 mais compacto */
+
+        box-sizing: border-box;
+        /* 🔥 garante ajuste interno */
       }
 
     }
 
     @media (max-width: 900px) and (orientation: landscape) {
+
+      .logo-mobile img {
+        width: 60px;
+        height: 60px;
+      }
 
       .header-fazenda {
         display: none;
@@ -228,10 +234,10 @@
       .logo-mobile {
         display: block;
         position: absolute;
-        top: 5px;
+        top: 70px;
+        /* 🔥 desce abaixo do zoom */
         left: 10px;
         z-index: 3000;
-        /* 🔥 mais alto que tudo */
       }
 
       .top-panel {
