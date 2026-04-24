@@ -175,7 +175,6 @@
       .logo-mobile {
         display: block;
         position: absolute;
-        top: 90px;
         left: 10px;
         z-index: 3000;
         /* 🔥 garante que fique acima do painel */
@@ -199,28 +198,25 @@
 
       #legenda {
         top: 100px;
-        right: 10px;
+        right: 8px;
 
-        max-height: 45vh;
-        max-width: 160px;
-        /* 🔥 reduz largura */
+        max-height: 40vh;
+        width: 140px;
 
         overflow-y: auto;
         overflow-x: hidden;
-        /* 🔥 evita corte lateral */
 
         font-size: 10px;
-        padding: 6px 8px;
+        line-height: 1.4;
+
+        padding: 8px;
 
         border-radius: 10px;
 
         box-sizing: border-box;
-        /* 🔥 garante ajuste interno */
 
-        word-wrap: break-word;
-        /* 🔥 QUEBRA TEXTO */
-        white-space: normal;
-        /* 🔥 PERMITE QUEBRA */
+        word-break: break-word;
+        /* 🔥 MAIS FORTE QUE word-wrap */
       }
 
     }
@@ -294,7 +290,7 @@
     cursor:pointer;
     box-shadow:0 2px 8px rgba(0,0,0,0.3);
     text-align:center;
-    width:200px;
+    width:100%;
   ">
       <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
         <img src="legenda.png" style="width:16px; height:16px;">
@@ -309,7 +305,9 @@
     background:white;
     padding:12px;
     border-radius:10px;
-    width:200px;
+    width:100%;
+    box-sizing:border-box;   /* 🔥 ESSENCIAL */
+    word-break:break-word;   /* 🔥 ESSENCIAL */
     box-shadow:0 4px 12px rgba(0,0,0,0.3);
     font-size:12px;
     line-height:1.4;
@@ -1401,7 +1399,13 @@
       const zoomRect = zoom.getBoundingClientRect();
 
       // 🔥 mesma altura dos cards
-      logo.style.top = (painelRect.top - 10) + 'px';
+      if (window.innerHeight > window.innerWidth) {
+        // 📱 MODO EM PÉ
+        logo.style.top = (painelRect.bottom + 10) + 'px';
+      } else {
+        // 📱 MODO DEITADO
+        logo.style.top = (painelRect.top - 10) + 'px';
+      }
 
       // 🔥 calcula o meio entre zoom e painel
       const meio = (zoomRect.right + painelRect.left) / 2;
@@ -1412,6 +1416,8 @@
 
     // roda quando carrega
     window.addEventListener('load', alinharLogo);
+
+    setTimeout(alinharLogo, 300);
 
     // roda quando muda tamanho (girar celular)
     window.addEventListener('resize', alinharLogo);
