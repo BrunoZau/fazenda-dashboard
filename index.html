@@ -33,10 +33,15 @@
       top: 10px;
       left: 50%;
       transform: translateX(-50%);
-      background: white;
-      padding: 10px 20px;
-      border-radius: 12px;
+
+      display: flex;
+      gap: 12px;
+      padding: 10px;
+
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 14px;
       font-size: 14px;
+
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       z-index: 1000;
     }
@@ -88,15 +93,6 @@
       font-weight: normal;
       color: white;
       opacity: 0.85;
-    }
-
-    .top-panel {
-      display: flex;
-      gap: 12px;
-      padding: 10px;
-      background: rgba(255, 255, 255, 0.85);
-      border-radius: 14px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
     .card {
@@ -152,29 +148,38 @@
       outline: none;
     }
 
+    .logo-mobile {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      display: none;
+    }
+
+    #legenda {
+      position: fixed;
+      right: 20px;
+      top: 100px;
+      z-index: 1000;
+    }
+
     @media (max-width: 768px) {
 
       .header-fazenda {
         display: none;
       }
 
-      .legenda-container {
-        top: 90px;
-        right: 10px;
-        transform: none;
+      .logo-mobile {
+        display: block;
       }
 
-    }
-
-    @media (max-width: 768px) {
-
       .top-panel {
-        left: 10px;
-        right: 10px;
-        transform: none;
+        left: 50%;
+        transform: translateX(-50%);
         overflow-x: auto;
         justify-content: flex-start;
         padding: 8px;
+        max-width: 95%;
       }
 
       .card {
@@ -182,38 +187,25 @@
         flex-shrink: 0;
       }
 
+      #legenda {
+        top: 80px;
+        right: 10px;
+      }
+
     }
 
-    @media (max-width: 768px) {
 
-      .header-fazenda {
-        top: 70px;
-        /* 🔥 empurra para baixo */
-        left: 50%;
-        transform: translateX(-50%);
-        text-align: center;
-        font-size: 18px;
-      }
-
-      .header-fazenda strong {
-        font-size: 20px;
-      }
-
-      .header-fazenda span {
-        font-size: 12px;
-      }
-
-      .icone-fazenda {
-        width: 28px;
-        height: 28px;
-        top: 4px;
-      }
-
+    .logo-mobile img {
+      width: 40px;
+      height: 40px;
     }
   </style>
 </head>
 
 <body>
+  <div class="logo-mobile">
+    <img src="FAB.png" alt="FAB">
+  </div>
 
   <div id="map"></div>
   <div class="header-fazenda">
@@ -225,12 +217,7 @@
   </div>
   <div class="top-panel" id="painel"></div>
 
-  <div id="legenda" style="
-  position:fixed;
-  right:20px;
-  top:100px;
-  z-index:1000;
-">
+  <div id="legenda">
 
     <!-- BOTÃO -->
     <div onclick="toggleLegenda()" style="
