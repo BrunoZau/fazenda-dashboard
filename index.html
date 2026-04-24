@@ -987,16 +987,16 @@
         // limitar distância do centro (não sair do círculo)
         let centroAtual = animal.rebanho.getLatLng();
 
-        let dist = Math.sqrt(
-          Math.pow(novaLat - centroAtual.lat, 2) +
-          Math.pow(novaLng - centroAtual.lng, 2)
-        );
+        let novaPos = L.latLng(novaLat, novaLng);
+
+        // distância real em metros
+        let dist = map.distance(novaPos, centroAtual);
 
         // pegar raio atual do círculo
         let raioAtual = animal.rebanho.getRadius();
 
         // converter raio (metros → lat/lng aproximado)
-        let limite = raioAtual * 0.00001;
+        let limite = raioAtual * 0.8;
 
         if (dist < limite) {
           animal.marker.setLatLng([novaLat, novaLng]);
