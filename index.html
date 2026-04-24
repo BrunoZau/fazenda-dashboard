@@ -248,7 +248,10 @@
       zoomDelta: 1
     }).setView([-9.18, -67.17], 14);
 
-    map.on('zoomend', ajustarCirculosPorZoom);
+    map.on('zoomend', () => {
+      ajustarCirculosPorZoom();
+      ajustarAnimaisPorZoom();
+    });
 
     L.tileLayer(
       'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -259,6 +262,41 @@
     ).addTo(map);
 
     // ================= FUNÇÕES =================
+
+    function ajustarAnimaisPorZoom() {
+
+      let zoom = map.getZoom();
+
+      animaisMovimento.forEach(animal => {
+
+        if (zoom <= 13) {
+          // esconder
+          if (map.hasLayer(animal.marker)) {
+            map.removeLayer(animal.marker);
+          }
+
+        } else if (zoom === 14) {
+          // mostrar parcialmente (ex: 50%)
+          if (Math.random() > 0.5) {
+            if (!map.hasLayer(animal.marker)) {
+              map.addLayer(animal.marker);
+            }
+          } else {
+            if (map.hasLayer(animal.marker)) {
+              map.removeLayer(animal.marker);
+            }
+          }
+
+        } else {
+          // mostrar todos
+          if (!map.hasLayer(animal.marker)) {
+            map.addLayer(animal.marker);
+          }
+        }
+
+      });
+
+    }
 
     function ajustarCirculosPorZoom() {
 
@@ -1055,6 +1093,7 @@
     }, 2000); // movimento lento
 
     ajustarCirculosPorZoom();
+    ajustarAnimaisPorZoom();
 
   </script>
 
