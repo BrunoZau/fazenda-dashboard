@@ -434,25 +434,31 @@
 
           let cor = corCoxo(c.data.qtd);
 
+          let classeAnimacao = "";
+
+          if (c.data.qtd < 5) {
+            classeAnimacao = "pulse";
+          }
+
           let icone = L.divIcon({
             className: '',
             html: `
-        <div style="
-          width: ${tamanho}px;
-          height: ${tamanho}px;
-          background: ${cor};
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border: 2px solid white;
-        ">
-          <img src="trough.png" style="
-            width: ${tamanho - 8}px;
-            height: ${tamanho - 8}px;
-          ">
-        </div>
-      `,
+              <div class="${classeAnimacao}" style="
+                width: ${tamanho}px;
+                height: ${tamanho}px;
+                background: ${cor};
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 2px solid white;
+              ">
+                <img src="trough.png" style="
+                  width: ${tamanho - 8}px;
+                  height: ${tamanho - 8}px;
+                ">
+              </div>
+            `,
             iconSize: [tamanho, tamanho],
             iconAnchor: [tamanho / 2, tamanho / 2]
           });
@@ -476,44 +482,29 @@
             if (deposito.estoque <= 600) cor = "#fbc02d";
             if (deposito.estoque < 300) cor = "#d32f2f";
 
-            icone = L.divIcon({
-              className: '',
-              html: `
-          <div style="
-            width: ${tamanho}px;
-            height: ${tamanho}px;
-            background: ${cor};
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid white;
-          ">
-            <span style="font-size:${tamanho - 14}px;">📦</span>
-          </div>
-        `,
-              iconSize: [tamanho, tamanho],
-              iconAnchor: [tamanho / 2, tamanho / 2]
-            });
+            let classeAnimacao = "";
 
-          } else {
-
-            // 🔹 OUTRAS ESTRUTURAS (casa, curral)
-            let emoji = e.data.nome.split(' ')[0];
+            if (deposito.estoque < 300) {
+              classeAnimacao = "pulse";
+            }
 
             icone = L.divIcon({
               className: '',
               html: `
-                <div style="
-                  font-size:${tamanho - 10}px;
-                  display:flex;
-                  align-items:center;
-                  justify-content:center;
+                <div class="${classeAnimacao}" style="
+                  width: ${tamanho}px;
+                  height: ${tamanho}px;
+                  background: ${cor};
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  border: 2px solid white;
                 ">
-                  ${emoji}
+                  <span style="font-size:${tamanho - 14}px;">📦</span>
                 </div>
               `,
-              iconSize: [tamanho - 6, tamanho - 6],
+              iconSize: [tamanho, tamanho],
               iconAnchor: [tamanho / 2, tamanho / 2]
             });
 
