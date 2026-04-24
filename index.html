@@ -251,6 +251,7 @@
     map.on('zoomend', () => {
       ajustarCirculosPorZoom();
       ajustarAnimaisPorZoom();
+      ajustarIconesPorZoom();
     });
 
     L.tileLayer(
@@ -262,6 +263,73 @@
     ).addTo(map);
 
     // ================= FUNÇÕES =================
+
+    function ajustarIconesPorZoom() {
+
+      let tamanho = tamanhoIconePorZoom();
+
+      // COCHOS
+      if (window.cochosLayer) {
+        cochosLayer.forEach(c => {
+
+          let cor = corCoxo(c.data.qtd);
+
+          let icone = L.divIcon({
+            className: '',
+            html: `
+        <div style="
+          width: ${tamanho}px;
+          height: ${tamanho}px;
+          background: ${cor};
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 2px solid white;
+        ">
+          <img src="trough.png" style="
+            width: ${tamanho - 8}px;
+            height: ${tamanho - 8}px;
+          ">
+        </div>
+      `,
+            iconSize: [tamanho, tamanho],
+            iconAnchor: [tamanho / 2, tamanho / 2]
+          });
+
+          c.marker.setIcon(icone);
+
+        });
+      }
+
+      // ESTRUTURAS
+      if (window.estruturasLayer) {
+        estruturasLayer.forEach(e => {
+
+          let icone = L.divIcon({
+            className: '',
+            html: `<div style="font-size:${tamanho - 10}px;">${e.data.nome.split(' ')[0]}</div>`,
+            iconSize: [tamanho, tamanho],
+            iconAnchor: [tamanho / 2, tamanho / 2]
+          });
+
+          e.marker.setIcon(icone);
+
+        });
+      }
+
+    }
+
+    function tamanhoIconePorZoom() {
+
+      let zoom = map.getZoom();
+
+      if (zoom <= 13) return 24;
+      if (zoom === 14) return 30;
+      if (zoom === 15) return 36;
+
+      return 42;
+    }
 
     function ajustarAnimaisPorZoom() {
 
@@ -764,6 +832,14 @@
         icon: iconeCoxo
       }).addTo(map);
 
+      // 🔥 guardar referência
+      if (!window.cochosLayer) window.cochosLayer = [];
+
+      cochosLayer.push({
+        marker: marker,
+        data: c
+      });
+
       marker.bindTooltip(`
         <div style="display:flex; align-items:center; gap:6px;">
           <img src="trough.png" style="width:16px; height:16px;">
@@ -890,6 +966,16 @@
       let marker = L.marker([e.lat, e.lng], { icon: icone })
         .addTo(map)
         .bindPopup(popupTexto);
+
+
+      // 🔥 guardar referência das estruturas
+      if (!window.estruturasLayer) window.estruturasLayer = [];
+
+      estruturasLayer.push({
+        marker: marker,
+        data: e
+      });
+
 
       // 🔥 TOOLTIP (IGUAL AO COCHO)
       marker.bindTooltip(`
@@ -1094,6 +1180,7 @@
 
     ajustarCirculosPorZoom();
     ajustarAnimaisPorZoom();
+    ajustarIconesPorZoom();
 
   </script>
 
