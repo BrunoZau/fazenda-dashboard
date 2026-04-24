@@ -999,7 +999,24 @@
         let limite = raioAtual * 0.8;
 
         if (dist < limite) {
+
+          // movimento normal
           animal.marker.setLatLng([novaLat, novaLng]);
+
+        } else {
+
+          // 🔥 FORÇA VOLTAR PARA DENTRO DO CÍRCULO
+
+          let angulo = Math.atan2(
+            novaLat - centroAtual.lat,
+            novaLng - centroAtual.lng
+          );
+
+          let novaLatCorrigida = centroAtual.lat + Math.sin(angulo) * (limite * 0.00001);
+          let novaLngCorrigida = centroAtual.lng + Math.cos(angulo) * (limite * 0.00001);
+
+          animal.marker.setLatLng([novaLatCorrigida, novaLngCorrigida]);
+
         }
 
       });
