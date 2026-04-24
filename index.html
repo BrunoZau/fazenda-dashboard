@@ -992,7 +992,13 @@
           Math.pow(novaLng - centroAtual.lng, 2)
         );
 
-        if (dist < 0.002) {
+        // pegar raio atual do círculo
+        let raioAtual = animal.rebanho.getRadius();
+
+        // converter raio (metros → lat/lng aproximado)
+        let limite = raioAtual * 0.00001;
+
+        if (dist < limite) {
           animal.marker.setLatLng([novaLat, novaLng]);
         }
 
