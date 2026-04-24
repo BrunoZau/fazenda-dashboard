@@ -163,7 +163,8 @@
       z-index: 1000;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 768px),
+    (orientation: landscape) {
 
       .header-fazenda {
         display: none;
@@ -190,6 +191,15 @@
       #legenda {
         top: 80px;
         right: 10px;
+      }
+
+    }
+
+    @media (orientation: landscape) {
+
+      .top-panel {
+        top: 5px;
+        transform: scale(0.9);
       }
 
     }
