@@ -259,8 +259,12 @@
     // ================= FUNÇÕES =================
 
     function raioRebanho(qtdAnimais) {
-      // escala visual (ajustável depois)
-      return Math.sqrt(qtdAnimais) * 20;
+
+      if (qtdAnimais <= 80) return 100;
+      if (qtdAnimais <= 120) return 140;
+      if (qtdAnimais <= 160) return 180;
+
+      return 220;
     }
 
     function quantidadeIcones(qtdAnimais) {
